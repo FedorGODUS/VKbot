@@ -15,4 +15,5 @@ public class CallbackMessage {
     private Long fromId;
     private String text;
     private Long groupId;
+    private String attachment;
 }

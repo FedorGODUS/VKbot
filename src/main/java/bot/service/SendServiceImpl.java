@@ -1,9 +1,8 @@
 package bot.service;
 
 import bot.config.VkConfig;
-import bot.entiry.CallbackMessage;
-import bot.entiry.Message;
 import bot.entiry.MessageResponse;
+import bot.entiry.ReplyMessage;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +13,6 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
-import java.util.Objects;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -25,26 +23,15 @@ public class SendServiceImpl implements SendService {
     private final VkConfig vkConfig;
 
     @Override
-    public void send(CallbackMessage callbackMessage) {
-        Message message = createMessage(callbackMessage);
-        message.setRandomId((long) callbackMessage.hashCode());
-        ResponseEntity<MessageResponse> responseEntity = restTemplate.postForEntity(createUri(message), null, MessageResponse.class);
+    public void send(ReplyMessage replyMessage) {
+        ResponseEntity<MessageResponse> responseEntity = restTemplate.postForEntity(createUri(replyMessage), null, MessageResponse.class);
         validate(responseEntity);
     }
 
 
-    public Message createMessage(CallbackMessage callbackMessage) {
-        return Message.builder()
-                .groupId(callbackMessage.getGroupId())
-                .peerId(callbackMessage.getPeerId())
-                .message("Вы напечатали: ".concat(callbackMessage.getText()))
-                .build();
-    }
-
-
-    public URI createUri(Message message) {
+    public URI createUri(ReplyMessage replyMessage) {
         try {
-            MultiValueMap<String, String> map = objectMapper.convertValue(message, LinkedMultiValueMap.class);
+            MultiValueMap<String, String> map = objectMapper.convertValue(replyMessage, LinkedMultiValueMap.class);
             return UriComponentsBuilder.fromHttpUrl("https://api.vk.com/method/messages.send")
                     .queryParam("access_token", vkConfig.getAccess_token())
                     .queryParam("v", vkConfig.getV())

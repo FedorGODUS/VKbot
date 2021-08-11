@@ -1,12 +1,9 @@
 package bot.service;
 
-import bot.entiry.CallbackMessage;
-import bot.entiry.Message;
-
-import java.net.URI;
+import bot.entiry.ReplyMessage;
 
 public interface SendService {
 
-    void send(CallbackMessage message);
+    void send(ReplyMessage replyMessage);
 
 }
